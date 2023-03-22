@@ -1,162 +1,274 @@
+#Step-1 : Create a new schema or database 
+#Step-2 : Import dataset
 
+#Specify which dataset to use
+use fifa_cup;
 
-		# Table 1
-create table Department(
-Code int not null primary key auto_increment,
-Name character(30),
-Budget int(10)
-);
-insert into Department(Code,Name,Budget)
-values(14,"IT",6500),
-(37,"Accounting",15000),
-(59,"Human Resources",240000),
-(77,"Research",55000);
-select * from Department;
+#1.	WRITE a sql query to show all the UNIQUE team names
+SELECT distinct(team)
+FROM group_stats;
 
-			# Table 2
-create table Employee(
-Id int not null primary key auto_increment,
-Name character(15),
-Last_Name character(15),
-Department int(3)
-);
-insert into Employee(Id,Name,Last_Name,Department)
-values(123234877,"Michael","Rogers",14),
-(152934485,"Anand","Manikutty",14),
-(222364883,"Carol","Smith",37),
-(326587417,"Joe","Stevens",37),
-(332154719,"Mary-Anne","Foster",14),
-(332569843,"George","ODonnell",77),
-(546523478,"John","Doe",59),
-(631231482,"Devid","Smith",77),
-(654873219,"Zacary","Efron",59),
-(745685214,"Eric","Goldsmith",59),
-(845657245,"Elizabeth","Doe",14),
-(845657246,"Kumar","Swamy",14);
-select * from Employee;
+#2.	Write a SQL query to show name of team which has rank 1 from group 7
+select team 
+from group_stats 
+where `rank`=1 and `group`=7;
 
-# 2.1 Select the last name of all employees.
-select Last_Name from Employee; # Ans = 12 Employee
+#3.	WRITE a sql query to show count of all team
+select count(team) 
+from group_stats;
 
-# 2.2 Select the last name of all employees, without duplicates.
-select distinct(Last_Name) from Employee;	# Ans = 10 Employee
+#4.	Write  a SQL query to show matches_played by each team
+select team, matches_played 
+from group_stats;
 
-# 2.3 Select all the data of employees whose last name is "Smith".
-select * from Employee where Last_Name = "Smith";	# Ans = 2 Employee
+#5.	Write a SQL query to show team, percent of wins with respect to matches_played by each team and name the resulting column as wins_percent
+select team, 100.0*(wins/matches_played) as wins_percent 
+from group_stats;
 
-# 2.4 Select all the data of employees whose last name is "Smith" or "Doe".
-select * from Employee where Last_Name in ("Smith","Doe"); # Ans= 4 Employee 
+#6.	Write a SQL query to show which team has maximum goals_scored and how much
+SELECT team, goals_scored 
+FROM group_stats
+WHERE goals_scored = (SELECT MAX(goals_scored) FROM group_stats);
 
-select * from employee where Last_Name="Smith" or Last_Name="Doe";
+#7.	Write a SQL query to show percent of draws with respect to matches_played round of to 2 digits by each team
+select team, round(100.0*(draws/matches_played), 2) 
+from group_stats;
 
-# 2.5 Select all the data of employees that work in department 14.
-select * from Employee where Department=14;	# Ans = 5 Employee
+#8.	Write a SQL query to show which team has minimum goals_scored and how much
+SELECT team, goals_scored 
+FROM group_stats 
+WHERE goals_scored = (SELECT min(goals_scored) FROM group_stats);
 
-# 2.6 Select all the data of employees that work in department 37 or department 77.
-select * from Employee where Department in (37,77);	# Ans = 7 Employee	
+#9.	Write a SQL query to show percent of losses with respect to matches_played by each team in ascending order by losses and name the resulting column as losses_percent
+select team, 100.0*(losses/matches_played) as losses_percent 
+from group_stats 
+order by losses_percent;
 
-select * from employee where department=37 or department=77;
+#10. Write a SQL query to show the average goal_difference
+select avg(goal_difference) 
+from group_stats;
 
-# 2.7 Select all the data of employees whose last name begins with an "S".
-select *  from Employee where Last_Name like "S%";	# Ans = Employee 
+#11. Write a SQL query to show name of the team where points are 0
+select team, points 
+from group_stats 
+where points=0;
 
-# 2.8 Select the sum of all the departments' budgets.
-select sum(Budget) from Department;	# Ans = 3,16,500.
+#12. Write a SQL query to show all data where expected_goal_scored is less than exp_goal_conceded
+select * 
+from group_stats 
+where expected_goal_scored < exp_goal_conceded;
 
-select Name,sum(budget) from department group by name;
+#13. Write a SQL query to show data where exp_goal_difference is in between -0.5 and 0.5
+select * 
+from group_stats 
+where exp_goal_difference between -0.5 and 0.5;
 
-# 2.9 Select the number of employees in each department 
-	#(you only need to show the department code and the number of employees).
-select Department,count(Name) as Total_Name
-from Employee group by Department;
+#14. Write a SQL query to show all data in ascending order by exp_goal_difference_per_90 
+select * 
+from group_stats 
+order by exp_goal_difference_per_90 asc;
 
-select Department,count(*) as Total_Name
-from Employee group by Department;
+#15. Write a SQL query to show team which has maximum number of players_used
+select team, players_used 
+from team_data 
+where players_used = (SELECT max(players_used) FROM team_data);
 
-# 2.10 Select all the data of employees, including each employee's department's data.
-select * from employee join department on Department.Code = employee.Department; 
+#16. Write a SQL query to show each team name and avg_age in ascending order by avg_age
+select team, avg_age 
+from team_data 
+order by avg_age;
 
-select a.*,B.* from employee a join department b on a.`Department`=b.`Code`;
+#17. WRITE a sql query to show average possession of teams
+select avg(possession) 
+from team_data;
 
-# 2.11 Select the name and last name of each employee, 
-	# along with the name and budget of the employee's department.
-select employee.Name as Emp_name,Employee.Last_Name,
-department.Name as Dep_Name,Department.Budget from employee 
-join department on Department.Code = employee.Department;
+#18. Write a SQL query to show team which has played atleast 5 games
+select team, games 
+from team_data 
+where games>=5;
 
-select a.name Emp_Name,a.Last_name,b.name as Dep_Name,b.budget from employee a join department b 
-on a.`Department`=b.`Code`;
+#19. Write a SQL query to show all data for which minutes is greater than 600
+select * 
+from team_data 
+where minutes>600;
 
-# 2.12 Select the name and last name of employees working for 
-	#departments with a budget greater than $60,000.
-select employee.Name as Emp_name,Employee.Last_Name,department.Name as Dep_Name,
-Department.Budget from employee
-join department on Department.Code = employee.Department
-where Department.Budget > 60000;
+#20. Write a SQL query to show team, goals, assists in ascending order by goals
+select team, goals, assists 
+from team_data 
+order by goals;
 
-select a.name Emp_Name,a.Last_Name,b.budget from employee a join department b 
-on a.`Department`=b.`Code` and b.`Budget`>60000;
+#21. Write a SQL query to show team, pens_made, pens_att in descending order by pens_made
+select team, pens_made, pens_att 
+from team_data 
+order by pens_made desc;
 
-select Name,Last_Name from employee
-where Department in (select code from department where budget>60000); 
+#22. Write a SQL query to show team, cards_yellow, cards_red where cards_red is equal to 1 in ascending order by cards_yellow
+select team, cards_yellow, cards_red 
+from team_data 
+where cards_red=1 
+order by cards_yellow;
 
-# *2.13 Select the departments with a budget larger than the 
-		# average budget of all the departments.
-select Employee.Department,avg(Department.Budget) as Avg_Bud
-from hiren_sql_2.employee
-join department on Department.Code = employee.Department
-group by employee.department order by Avg_Bud desc limit 1;
+#23. Write a SQL query to show team, goals_per90, assists_per90, goals_assists_per90 in descending order by goals_assists_per90
+select team, goals_per90, assists_per90, goals_assists_per90 
+from team_data 
+order by goals_assists_per90 desc;
 
-select * from department where budget > (select avg(budget) from department);
+#24. Write a SQL query to show team, goals_pens_per90, goals_assists_pens_per90 in ascending order by goals_assists_pens_per90
+select team, goals_pens_per90, goals_assists_pens_per90 
+from team_data 
+order by goals_assists_pens_per90;
 
-# 2.14 Select the names of departments with more than two employees.
-select 	b.name from employee a join department b 
-on a.`Department`=b.`Code` group by b.name having count(*)>2;
+#25. Write a SQL query to show team, shots, shots_on_target, shots_on_target_pct where shots_on_target_pct is less than 30 in ascending order by shots_on_target_pct
+select  team, shots, shots_on_target, shots_on_target_pct 
+from team_data 
+where shots_on_target_pct<30 
+order by shots_on_target_pct;
 
-select b.name from department b where Code in (select Departmnet from employee
-group by Department having count(*)>2);
+#26. Write a SQL query to show team, shots_per90, shots_on_target_per90 for team Belgium
+select team, shots_per90, shots_on_target_per90 
+from team_data 
+where team='Belgium';
 
-select name from department where code in (select department from employee 
-group by department having count(*)>2);
+#27. Write a SQL query to show team, goals_per_shot, goals_per_shot_on_target, average_shot_distance in descending order by average_shot_distance
+select team, goals_per_shot, goals_per_shot_on_target, average_shot_distance 
+from team_data 
+order by average_shot_distance desc;
 
-# *2.15 Very Important - Select the name and last name of employees working for departments 
-	# with second lowest budget.
-select employee.Name as Emo_Name,employee.Last_Name,min(department.Budget) from employee
-join department on Department.Code = employee.Department where department.Budget not in (select min(Budget) from Department)
-order by Budget desc;
+#28. Write a SQL query to show team, errors, touches for which errors is 0 and touches is less than 1500
+select team, errors, touches  
+from team_data 
+where errors=0 and touches<1500;
 
-select E.name,E.last_name,D.`Budget` from employee E inner join department D on E.department=D.code 
-where D.budget=(select budget from department order by budget limit 1,1);
+#29. Write a SQL query to show team, fouls which has maximum number of fouls
+select team, max(fouls) 
+from team_data;
+#or
+select team, fouls 
+from team_data 
+where fouls=(select max(fouls) from team_data);
 
+#30. Write a SQL query to show team, offisdes which has offsides less than 10 or greater than 20
+select team, offsides 
+from team_data 
+where offsides<10 or offsides>20;
 
-# 2.16 Add a new department called "Quality Assurance", with a budget of $40,000 and departmental code 11.
-	# And Add an employee called "Mary Moore" in that department, with SSN 847-21-9811.
-insert into Department(Code,Name,Budget)
-values(11,"Quality Assurance",40000);
-select * from hiren_sql_2.department;
-insert into Employee(Id,Name,Last_Name,Department)
-values(847219811,"Mary","Moore",11);
-select * from Employee;
+#31. Write a SQL query to show team, aerials_won, aerials_lost, aerials_won_pct in descending order by aerials_won_pct
+select team, aerials_won, aerials_lost, aerials_won_pct 
+from team_data 
+order by aerials_won_pct desc;
 
-# 2.17 Reduce the budget of all departments by 10%.
-select concat(employee.Name," ",employee.Last_Name) as Emp_Name,Department.Name as Dep_Name,Department.Budget,
-Budget*10/100 as Discount,Budget-Budget*10/100 as Act_Budget
-from Employee join department on department.Code=employee.Department;
+# group by
+#32. WRITE a sql query to show number of teams each group has
+select `group`, count(team) 
+from group_stats 
+group by `group`;
 
-select *,Budget*10/100 as Red_Budget,Budget-Budget*10/100 as Act_Budget from Department;
+#33. Write a SQL query to show team names group 6 has
+select team, `group` 
+from group_stats 
+where `group`=6;
 
-# *2.18 Reassign all employees from the Research department (code 77) to the IT department (code 14).
-update employee set department=14 where department=77;
+#34. Write a SQL query to show Australia belongs to which group
+select team, `group` 
+from group_stats
+where team='Australia';
 
-# 2.19 Delete from the table all employees in the IT department (code 14).
-delete from Employee where Department=14;
+#35. Write a SQL query to show group, average wins by each group
+select `group`, avg(wins) 
+from group_stats 
+group by `group`;
 
-# 2.20 Delete from the table all employees who work in departments with a budget greater than or equal to $60,000.
-delete employee from employee join department on employee.Department=department.Code
-where department.budget >= 60000;
+#36. Write a SQL query to show group, maximum expected_goal_scored by each group in ascending order by expected_goal_scored  
+select gs.`group`, max(gs.expected_goal_scored) as max_exp_goal_scored 
+from group_stats gs 
+group by gs.`group` 
+order by max_exp_goal_scored;
 
-delete from employee where `Department` in (select code from department where budget>=60000);
+#37. Write a SQL query to show group, minimum exp_goal_conceded by each group in descending order by exp_goal_conceded
+select gs.`group`, min(gs.exp_goal_conceded) as min_exp_goal_conceded 
+from group_stats gs 
+group by gs.`group` 
+order by min_exp_goal_conceded desc;
 
-# 2.21 Delete from the table all employees.
-delete from employee;
-select * from employee;
+#38. Write a SQL query to show group, average exp_goal_difference_per_90 for each group in ascending order by exp_goal_difference_per_90
+select gs.`group`, avg(gs.exp_goal_difference_per_90) as avg_exp_goal_diff_per_90 
+from group_stats gs 
+group by gs.`group` 
+order by avg_exp_goal_diff_per_90;
+
+#39. WRITE a query to show which team has equal number of goals_scored and goals_against
+select team, goals_scored, goals_against 
+from group_stats 
+where goals_scored = goals_against;
+
+#40. WRITE a query to show which team has maximum players_used
+select team, players_used 
+from team_data 
+where players_used=(select max(players_used) from team_data);
+
+#41. WRITE a query to show team, players_used, avg_age, games, minutes  where minutes less than 500 and greater than 200
+select team, players_used, avg_age, games, minutes 
+from team_data 
+where minutes < 500 and minutes > 200;
+
+#42. WRITE a query to show all data of group_stats in ascending order BY points
+select * 
+from group_stats 
+order by points;
+
+#43. WRITE a query to show ALL UNIQUE team in ascending order by team
+select distinct(team) 
+from team_data 
+order by team;
+
+#SQL Joins
+#44. WRITE a query to show average avg_age of each group and arrange it in descending order by avg_age.
+select gs.`group`, avg(td.avg_age) as avg_group_age
+from team_data td inner join group_stats gs 
+on td.team=gs.team
+group by gs.`group` 
+order by avg_group_age desc;
+
+#45. WRITE a query to show sum of fouls for each group and arrange it in ascending order by fouls.
+select gs.`group`, sum(td.fouls) as sum_fouls 
+from team_data td inner join group_stats gs 
+on td.team=gs.team
+group by gs.`group` 
+order by sum_fouls;
+
+#46. WRITE a query to show total number of games for each group and arrange it in descending order by games.
+select gs.`group`, sum(td.games) as sum_games 
+from team_data td inner join group_stats gs 
+on td.team=gs.team
+group by gs.`group` 
+order by sum_games desc;
+
+#47. WRITE a query to show total number of players_used for each group and arrange it in ascending order by players_used.
+select gs.`group`, sum(td.players_used) as sum_players_used 
+from team_data td inner join group_stats gs
+on td.team=gs.team
+group by gs.`group` 
+order by sum_players_used;
+
+#48. WRITE a query to show total number of offsides for each group and arrange it in ascending order by offsides.
+select gs.`group`, sum(td.offsides) as sum_offsides 
+from team_data td inner join group_stats gs 
+on td.team=gs.team
+group by gs.`group` 
+order by sum_offsides;
+
+#49. WRITE a query to show average passes_pct for each group and arrange it in descending order by passes_pct.
+select gs.`group`, avg(td.passes_pct) as avg_passes_pct
+from team_data td inner join group_stats gs 
+on td.team=gs.team
+group by gs.`group` 
+order by avg_passes_pct desc;
+
+#50. WRITE a query to show average goals_per90 for each group and arrange it in ascending order by goals_per90.
+select gs.`group`, avg(td.goals_per90) as avg_goals_per90
+from team_data td inner join group_stats gs 
+on td.team=gs.team
+group by gs.`group` 
+order by avg_goals_per90;
+
+#END OF FILE.
